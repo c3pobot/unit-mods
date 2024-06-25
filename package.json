@@ -1,0 +1,22 @@
+{
+  "name": "unit-mods",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update": "chmod a+x updategitdependency.sh && ./updategitdependency.sh",
+    "build": "chmod a+x buildtestimage.sh && ./buildtestimage.sh c3pobot/unit-mods",
+    "prod": "chmod a+x buildprodimage.sh && ./buildprodimage.sh c3pobot/unit-mods"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.5",
+    "json-array-sorter": "^0.0.5",
+    "logger": "github:c3pobot/logger",
+    "mongoclient": "github:c3pobot/mongoclient",
+    "node-fetch": "^2.6.7",
+    "numeral": "^2.0.6"
+  }
+}
