@@ -7,6 +7,7 @@ const sync = require('./sync')
 
 const checkMongo = ()=>{
   log.info(`start up mongo check...`)
+  let status = mongo.status()
   if(status) log.debug(`local mongo connection ready...`)
   if(status) status = remoteMongo.status()
   if(status) log.debug(`remote mongo connection ready...`)

@@ -95,7 +95,7 @@ module.exports = async(playerIds = [])=>{
       }
 
     }
-    await remoteMongo.set('modRecommendation', { _id: }, { sets: modSets, totalCount:  totalCount, stats: modStats })
+    await remoteMongo.set('modRecommendation', { _id: unit.baseId }, { sets: modSets, totalCount:  totalCount, stats: modStats })
     await mongo.set('modRecommendation', { _id: unit.baseId }, { sets: modSets, totalCount:  totalCount, stats: modStats })
   })
 }
