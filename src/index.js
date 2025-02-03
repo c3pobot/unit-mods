@@ -1,16 +1,13 @@
 'use strict'
 const log = require('logger')
 const mongo = require('mongoclient')
-const remoteMongo = require('./remoteMongo')
 const swgohClient = require('./swgohClient')
 const sync = require('./sync')
 
 const checkMongo = ()=>{
   log.info(`start up mongo check...`)
   let status = mongo.status()
-  if(status) log.debug(`local mongo connection ready...`)
-  if(status) status = remoteMongo.status()
-  if(status) log.debug(`remote mongo connection ready...`)
+  if(status) log.debug(`mongo connection ready...`)
   if(status){
     checkApi()
     return

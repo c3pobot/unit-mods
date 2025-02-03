@@ -1,6 +1,5 @@
 'use strict'
 const mongo = require('mongoclient')
-const remoteMongo = require('src/remoteMongo')
 const { eachLimit } = require('async')
 const sorter = require('json-array-sorter')
 const mapSetIds = (set = {}, array = [], totalCount = 0)=>{
@@ -95,7 +94,6 @@ module.exports = async(playerIds = [])=>{
       }
 
     }
-    await remoteMongo.set('modRecommendation', { _id: unit.baseId }, { sets: modSets, totalCount:  totalCount, stats: modStats })
     await mongo.set('modRecommendation', { _id: unit.baseId }, { sets: modSets, totalCount:  totalCount, stats: modStats })
   })
 }
