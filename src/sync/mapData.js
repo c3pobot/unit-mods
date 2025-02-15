@@ -1,4 +1,5 @@
 'use strict'
+const log = require('logger')
 const mongo = require('mongoclient')
 const { eachLimit } = require('async')
 const sorter = require('json-array-sorter')
@@ -16,6 +17,7 @@ const checkCompleteSets = (sets = {})=>{
   }
   if(count === 6) return true
 }
+
 const mapModSets = (mods = [], modSets = {}, modStats = {}, modDef = {}, modEnum = {})=>{
   let sets = {}, stats = []
   for(let i in mods){
@@ -49,16 +51,40 @@ const mapModSets = (mods = [], modSets = {}, modStats = {}, modDef = {}, modEnum
   }
   return true
 }
+
+const mapModType = (unit = {}, mods = [], modDef = {}, statDef = {}, modTypeMap = {})=>{
+  try{
+    if(!unit.baseId || mods.length == 0) return
+    for(let i in mods){
+      if(modDef[mods[i].definitionId]?.rarity < 5 || !mods[i]?.primaryStat?.stat?.unitStatId) continue
+      let tempDef = modDef[mods[i].definitionId]
+      if(!tempDef.slot) continue
+      let key = `${tempDef.setId}-${tempDef.slot}-${mods[i].primaryStat.stat.unitStatId}`
+      if(!modTypeMap[key]) modTypeMap[key] = { id: key, slot: tempDef.slot, slotNameKey: tempDef.slotNameKey, setId: tempDef.setId, setNameKey: tempDef.nameKey, primaryStat: mods[i].primaryStat.stat.unitStatId, statNameKey: statDef[mods[i].primaryStat.stat.unitStatId]?.nameKey, units: {}, count: 0 }
+      if(modTypeMap[key]) modTypeMap[key].count++
+      if(!modTypeMap[key].units[unit.baseId]) modTypeMap[key].units[unit.baseId] = { baseId: unit.baseId, nameKey: unit.name, count: 0 }
+      if(modTypeMap[key].units[unit.baseId]) modTypeMap[key].units[unit.baseId].count++
+    }
+  }catch(e){
+    log.error(e)
+  }
+}
 module.exports = async(playerIds = [])=>{
+
   let unitList = (await mongo.find('autoComplete', { _id: 'unit' }, { data: { combatType: 1, baseId: 1, name: 1 }}))[0]
   if(!unitList?.data || unitList?.data?.length === 0) return
 
   unitList = unitList.data.filter(x=>x.combatType === 1)
   if(!unitList || unitList?.length === 0) return
 
-  let modDef = (await mongo.find('configMaps', { _id: 'modDefMap' }, { data: 1}))[0]
-  modDef = modDef?.data
+  let modDef = (await mongo.find('configMaps', { _id: 'modDefMap' }, { data: 1}))[0]?.data
   if(!modDef || !modDef['111']) return
+
+  let statDef = (await mongo.find('configMaps', { _id: 'statDefMap' }, { data: 1}))[0]?.data
+  if(!statDef || !statDef[1]) return
+
+  let modTypeMap = {}
+  log.debug('started sync of unit-mods')
   await eachLimit(unitList, 80, async(unit)=>{
     if(!unit?.baseId) return
 
@@ -68,6 +94,7 @@ module.exports = async(playerIds = [])=>{
 
     let modSets = {}, modStats = {}, modEnum = {}, totalCount = 0
     for(let i in players){
+      mapModType(unit, players[i]?.roster[unit.baseId]?.mods, modDef, statDef, modTypeMap)
       let mapModSetStatus = mapModSets(players[i]?.roster[unit.baseId]?.mods, modSets, modStats, modDef, modEnum)
       if(mapModSetStatus) totalCount++
     }
@@ -96,4 +123,6 @@ module.exports = async(playerIds = [])=>{
     }
     await mongo.set('modRecommendation', { _id: unit.baseId }, { sets: modSets, totalCount:  totalCount, stats: modStats })
   })
+  for(let i in modTypeMap) await mongo.set('modTypeRecommendation', { _id: modTypeMap[i].id }, modTypeMap[i])
+  log.debug('finished sync of unit-mods')
 }
