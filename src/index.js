@@ -2,31 +2,42 @@
 const log = require('logger')
 const mongo = require('mongoclient')
 const swgohClient = require('./swgohClient')
+const { dataList } = require('./dataList')
 const sync = require('./sync')
 
-const checkMongo = ()=>{
-  log.info(`start up mongo check...`)
-  let status = mongo.status()
-  if(status) log.debug(`mongo connection ready...`)
-  if(status){
-    checkApi()
+const CheckMongo = ()=>{
+  if(mongo?.ready){
+    CheckApi()
     return
   }
-  setTimeout(checkMongo, 5000)
+  setTimeout(CheckMongo, 5000)
 }
-const checkApi = async()=>{
+const CheckApi = async()=>{
   try{
     log.info(`start up api check...`)
     let obj = await swgohClient('metadata')
     if(obj?.latestGamedataVersion){
       log.info('API is ready. Starting Sync...')
+      CheckGameData()
+      return
+    }
+    setTimeout(CheckApi, 5000)
+  }catch(e){
+    log.error(e)
+    setTimeout(CheckApi, 5000)
+  }
+}
+const CheckGameData = async()=>{
+  try{
+    log.info(`start up gameData check...`)
+    if(dataList?.gameData?.unitData){
       startSync()
       return
     }
-    setTimeout(checkApi, 5000)
+    setTimeout(CheckGameData, 5000)
   }catch(e){
     log.error(e)
-    setTimeout(checkApi, 5000)
+    setTimeout(CheckGameData, 5000)
   }
 }
 const startSync = async()=>{
@@ -38,4 +49,4 @@ const startSync = async()=>{
     setTimeout(startSync, 5000)
   }
 }
-checkMongo()
+CheckMongo()

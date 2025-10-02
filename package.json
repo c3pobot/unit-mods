@@ -17,6 +17,7 @@
     "logger": "github:c3pobot/logger",
     "mongoclient": "github:c3pobot/mongoclient",
     "node-fetch": "^2.6.7",
-    "numeral": "^2.0.6"
+    "numeral": "^2.0.6",
+    "statcalc": "github:c3pobot/statcalc"
   }
 }

@@ -11,7 +11,7 @@ module.exports = async()=>{
   if(!playerIds || playerIds?.length === 0) return
   log.debug(`found ${playerIds?.length} players to sync...`)
   let timeStart = Date.now()
-  let status = await syncPlayers(playerIds)
+  await syncPlayers(playerIds)
   log.debug(`sync for ${limit} players completed in ${(Date.now() - timeStart) / 1000} seconds...`)
   await mapData(playerIds)
 }

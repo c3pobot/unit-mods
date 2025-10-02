@@ -2,11 +2,15 @@
 const mongo = require('mongoclient')
 const { eachLimit } = require('async')
 const swgohClient = require('src/swgohClient')
+const statCalc = require('statcalc');
 
 const getPlayer = async(playerId)=>{
   if(!playerId) return
   let data = await swgohClient('player', { playerId: playerId })
   if(!data?.rosterUnit || data?.rosterUnit?.length === 0) return
+
+  let profile = statCalc.calcRosterStats(data.rosterUnit, data?.allyCode)
+  if(!profile?.summary) return
 
   let res = { playerId: playerId, allyCode: +data.allyCode, roster: {} }
   let rosterUnit = data.rosterUnit
@@ -15,7 +19,7 @@ const getPlayer = async(playerId)=>{
     if(!rosterUnit[i].equippedStatMod || rosterUnit[i].equippedStatMod?.length < 6 ) continue
     let baseId = rosterUnit[i]?.definitionId?.split(':')[0]
     if(!baseId) continue
-    res.roster[baseId] = { baseId: baseId, mods: rosterUnit[i].equippedStatMod }
+    res.roster[baseId] = { baseId: baseId, mods: rosterUnit[i].equippedStatMod, stats: rosterUnit[i].stats }
   }
   await mongo.set('playerModCache', { _id: playerId }, res)
 }
