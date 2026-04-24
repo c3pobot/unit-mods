@@ -4,7 +4,6 @@ const { eachLimit } = require('async')
 const swgohClient = require('src/swgohClient')
 const statCalc = require('statcalc');
 const updateMeta = require('./updateMeta')
-const cache = require('src/cache')
 
 const getPlayer = async(playerId)=>{
   if(!playerId) return
@@ -26,7 +25,6 @@ const getPlayer = async(playerId)=>{
     if(!baseId) continue
     res.roster[baseId] = { baseId: baseId, mods: rosterUnit[i].equippedStatMod, stats: rosterUnit[i].stats }
   }
-  //await cache.set('playerCache', playerId, res)
   updateMeta(res)
   return res
 }

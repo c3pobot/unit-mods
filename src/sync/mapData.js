@@ -5,7 +5,6 @@ const { eachLimit } = require('async')
 const sorter = require('json-array-sorter')
 const cache = require('src/cache')
 
-const getPlayers = require('./get_players')
 const mapSetIds = (set = {}, array = [], totalCount = 0)=>{
   if(set.setCount > set.count) return
   let count = Math.floor(set.count / set.setCount)
