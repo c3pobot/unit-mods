@@ -1,0 +1,6 @@
+module.exports = [
+  `CREATE TABLE IF NOT EXISTS modRecommendation (id TEXT NOT NULL PRIMARY KEY, data BLOB NOT NULL, ttl INT)`,
+  `CREATE TABLE IF NOT EXISTS modSetRecommendation (id TEXT NOT NULL PRIMARY KEY, data BLOB NOT NULL, ttl INT)`,
+  `CREATE TABLE IF NOT EXISTS modTypeRecommendation (id TEXT NOT NULL PRIMARY KEY, data BLOB NOT NULL, ttl INT)`,
+  `CREATE TABLE IF NOT EXISTS playerCache (id TEXT NOT NULL PRIMARY KEY, data BLOB NOT NULL, ttl INT)`
+]

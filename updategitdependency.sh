@@ -5,3 +5,5 @@ echo updating mongoclient
 npm i --package-lock-only github:/c3pobot/mongoclient
 echo updating statcalc
 npm i --package-lock-only github:/c3pobot/statcalc
+echo updating valkey-cache
+npm i --package-lock-only github:/c3pobot/valkey-cache

@@ -16,12 +16,15 @@ const getGaEvent = async()=>{
   return gaEvent
 }
 const getPlayers = async(eventInstanceId, limit = 1000) =>{
-  let res = []
+  let res = [], playersFound = false
   for(let i = 0;i<limit;i++){
     let bracket = (await mongo.find('gaPlayers', { _id: `${eventInstanceId}:KYBER:${i}`}, { players: 1, groupId: 1, _id: 1}))[0]
     if(!bracket?.players || bracket?.players?.length == 0) continue
-    for(let p in bracket.players) res.push(bracket.players[p].id)
-    if(res?.length >= limit) break
+    for(let p in bracket.players){
+      res.push(bracket.players[p].id)
+      if(res?.length >= limit) playersFound = true
+    }
+    if(playersFound) break
   }
   return res
 }

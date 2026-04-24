@@ -12,12 +12,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.29.2",
     "async": "^3.2.5",
     "json-array-sorter": "^0.0.5",
     "logger": "github:c3pobot/logger",
     "mongoclient": "github:c3pobot/mongoclient",
     "node-fetch": "^2.6.7",
     "numeral": "^2.0.6",
+    "rqlite-js": "^2.5.7",
     "statcalc": "github:c3pobot/statcalc"
   }
 }
