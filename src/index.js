@@ -1,64 +1,46 @@
-'use strict'
-const log = require('logger')
-const mongo = require('mongoclient')
-const swgohClient = require('./swgohClient')
-const { dataList } = require('./dataList')
-const sync = require('./sync')
-const cache = require('./cache')
-const CheckMongo = ()=>{
-  if(mongo?.ready){
-    CheckCache()
-    return
-  }
-  setTimeout(CheckMongo, 5000)
-}
-const CheckCache = ()=>{
-  let status = cache.status()
-  if(status){
-    CheckApi()
-    return
-  }
-  setTimeout(CheckCache, 5000)
-}
-const CheckApi = async()=>{
+import log from './logger.js'
+import swgohClient from './swgoh_client.js'
+import { dataList } from './data_list.js'
+import sync from './sync/index.js'
+import cache from './cache.js'
+
+async function checkApi(){
   try{
-    log.info(`start up api check...`)
-    //process.exit(1)
     let obj = await swgohClient('metadata')
-    console.log(obj?.latestGamedataVersion)
     if(obj?.latestGamedataVersion){
-      log.info('API is ready. Starting Sync...')
-      CheckGameData()
-      return
+      log.info('API is ready..')
+      return checkCache()
     }
-    setTimeout(CheckApi, 5000)
+    setTimeout(checkApi, 10000)
   }catch(e){
     log.error(e)
-    setTimeout(CheckApi, 5000)
+    setTimeout(checkApi, 5000)
   }
 }
-const CheckGameData = async()=>{
+function checkCache(){
   try{
-    log.info(`start up gameData check...`)
+    let status = cache.status()
+    if(status){
+      log.info(`cache is ready...`)
+      return checkGameData()
+    }
+    setTimeout(checkCache, 5000)
+  }catch(e){
+    log.error(e)
+    setTimeout(checkCache, 5000)
+  }
+}
+function checkGameData(){
+  try{
     if(dataList?.gameData?.unitData){
-      startSync()
-      return
+      log.info(`gameData is ready...`)
+      //return
+      return sync()
     }
-    setTimeout(CheckGameData, 5000)
+    setTimeout(checkGameData, 5000)
   }catch(e){
     log.error(e)
-    setTimeout(CheckGameData, 5000)
+    setTimeout(checkGameData, 5000)
   }
 }
-const startSync = async()=>{
-  try{
-
-    await sync()
-
-    setTimeout(startSync, 3600 * 1000 )
-  }catch(e){
-    log.error(e)
-    setTimeout(startSync, 5000)
-  }
-}
-CheckMongo()
+checkApi()

@@ -1,9 +1,9 @@
 #!/bin/bash
-echo updating logger
-npm i --package-lock-only github:c3pobot/logger
-echo updating mongoclient
-npm i --package-lock-only github:/c3pobot/mongoclient
-echo updating statcalc
-npm i --package-lock-only github:/c3pobot/statcalc
-echo updating valkey-cache
-npm i --package-lock-only github:/c3pobot/valkey-cache
+echo updating data-cache
+npm i --package-lock-only github:c3pobot/data-cache
+echo updating rqlite-cache
+npm i --package-lock-only github:c3pobot/rqlite-cache
+echo updating mongo-cache
+npm i --package-lock-only github:c3pobot/mongo-cache
+echo updating mongo-cache-local
+npm i --package-lock-only github:c3pobot/mongo-cache-local

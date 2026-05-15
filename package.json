@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "update": "chmod a+x updategitdependency.sh && ./updategitdependency.sh",
@@ -12,14 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.29.2",
     "async": "^3.2.5",
+    "data-cache": "github:c3pobot/data-cache",
     "json-array-sorter": "^0.0.5",
-    "logger": "github:c3pobot/logger",
-    "mongoclient": "github:c3pobot/mongoclient",
-    "node-fetch": "^2.6.7",
-    "numeral": "^2.0.6",
-    "rqlite-js": "^2.5.7",
-    "statcalc": "github:c3pobot/statcalc"
+    "mongo-cache": "github:c3pobot/mongo-cache",
+    "mongo-cache-local": "github:c3pobot/mongo-cache-local",
+    "rqlite-cache": "github:c3pobot/rqlite-cache"
   }
 }

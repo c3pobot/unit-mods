@@ -1,9 +1,9 @@
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 COPY package*.json ./
 # don't install dev dependencies for the docker image
 RUN npm install --omit=dev
 
-FROM node:20-alpine AS app
+FROM node:22-alpine AS app
 LABEL org.opencontainers.image.source=https://github.com/c3pobot/unit-mods
 WORKDIR /app
 ENV NODE_PATH=/app
