@@ -3,6 +3,7 @@ import swgohClient from './swgoh_client.js'
 import { dataList } from './data_list.js'
 import sync from './sync/index.js'
 import cache from './cache.js'
+import updateIndexes from './update_indexes.js'
 
 async function checkApi(){
   try{
@@ -34,13 +35,22 @@ function checkGameData(){
   try{
     if(dataList?.gameData?.unitData){
       log.info(`gameData is ready...`)
-      //return
-      return sync()
+      return checkIndexes()
     }
     setTimeout(checkGameData, 5000)
   }catch(e){
     log.error(e)
     setTimeout(checkGameData, 5000)
+  }
+}
+async function checkIndexes(){
+  try{
+    let status = await updateIndexes()
+    if(!status) return setTimeout(checkIndexes, 5000)
+    return sync()
+  }catch(e){
+    log.error(e)
+    setTimeout(checkIndexes, 5000)
   }
 }
 checkApi()

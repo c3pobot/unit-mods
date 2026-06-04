@@ -1,19 +1,27 @@
 import log from './logger.js'
 //import playerCache from './player_cache.js'
-import dataCache from 'data-cache'
 import RqliteCache from 'rqlite-cache'
-import mongo from 'mongo-cache'
-import LocalMongo from 'mongo-cache-local'
+import { MongoCache } from 'mongo-cache'
 
 const MOD_CACHE_URL = ['http://mods-cache-0.mods-cache-internal.datastore.svc.cluster.local:4001', 'http://mods-cache-1.mods-cache-internal.datastore.svc.cluster.local:4001', 'http://mods-cache-2.mods-cache-internal.datastore.svc.cluster.local:4001']
-const GA_CACHE_DB = process.env.GA_CACHE_DB || 'swgoh'
+
 const modCache = new RqliteCache({ rqliteHost: MOD_CACHE_URL, tableName: 'modRecommendation', createTable: true, jsonOnly: true })
 const modSetCache = new RqliteCache({ rqliteHost: MOD_CACHE_URL, tableName: 'modSetRecommendation', createTable: true, jsonOnly: true })
 const modTypeCache = new RqliteCache({ rqliteHost: MOD_CACHE_URL, tableName: 'modTypeRecommendation', createTable: true, jsonOnly: true })
-const gaCache = new mongo.MongoCache(GA_CACHE_DB)
-//const playerCache = new mongo.MongoCache('mod_cache')
 
-const playerCache = new LocalMongo({ connection_string: 'mongodb://localhost:3100/?compressors=zlib&retryReads=true&retryWrites=true&maxPoolSize=200', collections: [ { name: 'playerModCache', expireSeconds: 6 * 3600 }, { name: 'lowGPPlayers', expireSeconds: 24 * 3600 } ]})
+const dataCache = new MongoCache({
+  connection_string: 'mongodb://mongo-data-rs2.datastore.svc.cluster.local?replicaSet=rs2&ssl=false&compressors=snappy&retryReads=true&retryWrites=true',
+  db_name: 'game_data'
+ })
+const playerCache = new MongoCache({
+  connection_string: 'mongodb://localhost:3100/?ssl=false&compressors=snappy&retryReads=true&retryWrites=true',
+  db_name: 'player_cache'
+ })
+
+ const gaCache = new MongoCache({
+    connection_string: 'mongodb://mongo-ga-rs1.datastore.svc.cluster.local:27018?replicaSet=rs1&ssl=false&compressors=snappy&retryReads=true&retryWrites=true',
+    db_name: 'ga_data'
+ })
 
 function status(){
   let status = modCache.status()
@@ -22,7 +30,7 @@ function status(){
   if(!status) return
   status = modTypeCache.status()
   if(!status) return
-  status = mongo.status()
+  status = gaCache.status()
   if(!status) return
   return playerCache.status()
 }

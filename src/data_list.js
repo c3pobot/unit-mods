@@ -1,13 +1,13 @@
 import log from './logger.js'
 import statCalc from './stat_calc.js'
 
-import dataCache from 'data-cache'
+import { dataCache } from './cache.js'
 
 let dataList = { gameData: {}, gameVersion: '' }
 
 async function updateGameData(){
   try{
-    let obj = await dataCache.get('data', 'gameData')
+    let obj = await dataCache.get('data', { _id: 'gameData' })
     if(!obj.data || !obj.gameVersion) return
     if(obj.gameVersion == dataList.gameVersion) return true
 

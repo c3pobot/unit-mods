@@ -14,10 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "async": "^3.2.5",
-    "data-cache": "github:c3pobot/data-cache",
     "json-array-sorter": "^0.0.5",
     "mongo-cache": "github:c3pobot/mongo-cache",
-    "mongo-cache-local": "github:c3pobot/mongo-cache-local",
     "rqlite-cache": "github:c3pobot/rqlite-cache"
   }
 }

@@ -26,7 +26,7 @@ async function requestWithRetry(uri, opts = {}, count = 0){
     if(res?.body?.code == 6 && count < retryCount) return await requestWithRetry(uri, opts, count)
     if(!res?.ok && !res?.body?.code && count < retryCount) return await requestWithRetry(uri, opts, count)
     if(!res?.ok && count >= retryCount){
-      if(res) log.error(`tried request ${count} time(s) and errored with ${JSON.stringify(res)}`)
+      if(res) log.debug(`tried request ${count} time(s) and errored with ${JSON.stringify(res)}`)
     }
     return res
   }catch(e){
