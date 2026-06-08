@@ -2,55 +2,45 @@ import log from './logger.js'
 
 const GAME_CLIENT_URL = process.env.GAME_CLIENT_URL || 'http://swgoh-client:3000', retryCount = +process.env.CLIENT_RETRY_COUNT || 6, API_KEY = process.env.API_KEY
 
-async function apiRequest(uri, opts){
-  try{
-    opts.signal = AbortSignal.timeout(20000)
-    let r = await fetch(uri, opts)
-    let body = await r?.json()
-    if(!r?.ok){
-      log.error(`[fetch-error]`)
-      if(body) console.error(JSON.stringify(body))
-    }
-    return { body, ok: r.ok, status: r.status }
-  }catch(e){
-    if(e?.name) return { ok: false, error: e.name }
-    log.error(`[fetch-error]`)
-    log.error(e)
-  }
+async function parseResponse(r){
+  let contentType = r?.headers.get("content-type")
+  if(contentType && contentType?.indexOf("application/json") !== -1) return await r?.json()
 }
 
 async function requestWithRetry(uri, opts = {}, count = 0){
   try{
-    let res = await apiRequest(uri, opts)
+    opts.signal = AbortSignal.timeout(30000)
+    let r = await fetch(uri, opts)
     count++
-    if(res?.body?.code == 6 && count < retryCount) return await requestWithRetry(uri, opts, count)
-    if(!res?.ok && !res?.body?.code && count < retryCount) return await requestWithRetry(uri, opts, count)
-    if(!res?.ok && count >= retryCount){
-      if(res) log.debug(`tried request ${count} time(s) and errored with ${JSON.stringify(res)}`)
+
+    let res = await parseResponse(r)
+    if(!r.ok && !res?.code && count < retryCount) return await requestWithRetry(uri, opts, count)
+    if((!r.ok || res?.code === 6 || (r?.status === 400 && res?.message && res?.code !== 4)) && count < retryCount) return await requestWithRetry(uri, opts, count)
+    if(!r.ok){
+      if(res?.code == 6) return
+      log.error(`[swgoh-client] : ${uri}`)
+      if(res) console.error(JSON.stringify(res))
+      return
     }
     return res
   }catch(e){
-    throw(e)
+    log.error(`[swgoh-client]`)
+    console.error(e)
   }
 }
-export default async function(uri, payload){
+export default async function(uri, payload, identity){
   try{
-    if(!GAME_CLIENT_URL){
-      log.error(`missing GAME_CLIENT_URL`)
-      return
-    }
-
-    let opts = { headers: {}, compress: true, method: 'POST' }
-    if(API_KEY) opt.headers['Authorization'] = `Bearer ${API_KEY}`
-    if(payload){
-      let body = { payload: payload }
+    let opts = { method: 'POST', compress: true }
+    if(payload || identity){
+      let body = {}
+      if(payload) body.payload = payload
+      if(identity) body.identity = identity
       opts.body = JSON.stringify(body)
-      opts.headers['Content-Type'] = 'application/json'
+      opts.headers = { "Content-Type": "application/json" }
     }
-    let res = await requestWithRetry(`${GAME_CLIENT_URL}/${uri}`, opts)
-    if(res?.body?.message && res?.body?.code !== 5) log.error(uri+' : Code : '+res.body.code+' : Msg : '+res.body.message)
-    if(res?.body) return res.body
+    return await requestWithRetry(`${GAME_CLIENT_URL}/${uri}`, opts, 0)
   }catch(e){
-    log.error(e);
+    log.error(`[swgoh-client]`)
+    log.error(e)
   }
 }
