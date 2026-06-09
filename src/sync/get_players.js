@@ -4,6 +4,11 @@ import statCalc from '../stat_calc.js'
 import { playerCache } from '../cache.js'
 import swgohClient from '../swgoh_client.js'
 
+function sleep(ms = 2000){
+  return new Promise((resolve)=>{
+    setTimeout(resolve, ms)
+  })
+}
 async function getPlayer(playerId){
   try{
     if(!playerId) return
@@ -42,10 +47,11 @@ export default async function(playerIds = []){
   let lowPlayers = await playerCache.all('lowGPPlayers', {}, { playerId: 1 })
 
   let lowGPSet = new Set(lowPlayers?.filter(x=>x?.playerId)?.map(x=>x?.playerId))
-  await eachLimit(playerIds, 100, async(playerId)=>{
+  await eachLimit(playerIds, 25, async(playerId)=>{
     if(lowGPSet.has(playerId)) return
     let player = await getPlayer(playerId)
     if(player) players.push(player)
+    await sleep()
   })
   return players
 }

@@ -19,7 +19,7 @@ async function requestWithRetry(uri, opts = {}, count = 0){
     if(!r.ok){
       if(res?.code == 6) return
       log.error(`[swgoh-client] : ${uri}`)
-      if(res) console.error(JSON.stringify(res))
+      if(res) log.error(JSON.stringify(res))
       return
     }
     return res
