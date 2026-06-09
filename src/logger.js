@@ -1,9 +1,20 @@
 let logLevel = process.env.LOG_LEVEL || 'info';
-function getTimeStamp(timestamp){
-  if(!timestamp) timestamp = Date.now()
-  let dateTime = new Date(timestamp)
-  return dateTime.toLocaleString('en-US', { timeZone: 'Etc/GMT+5', hour12: false })
+
+const timestampFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Etc/GMT+5',
+  hour12: false,
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+});
+
+function getTimeStamp(timestamp = Date.now()) {
+  return timestampFormatter.format(new Date(timestamp));
 }
+
 function error(err){
   try{
     console.error(`${getTimeStamp(Date.now())} ERROR ${err}`)
